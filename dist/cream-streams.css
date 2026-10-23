@@ -4,10 +4,11 @@ body{position:relative}
 .cream-flow{position:absolute;top:0;bottom:0;width:clamp(28px,calc((100vw - 1240px)/2 - 12px),240px);pointer-events:none;opacity:.9}
 .cream-flow-left{left:0}.cream-flow-right{right:0;transform:scaleX(-1)}
 .cream-chunk{position:absolute;left:0;right:0;overflow:hidden;contain:layout paint;isolation:isolate;background-image:var(--cream-colors);background-size:100% var(--cream-height);background-position:0 calc(-1 * var(--chunk-y));-webkit-mask:url('assets/decor/cream-mask.svg') center top/100% 180px repeat-y;mask:url('assets/decor/cream-mask.svg') center top/100% 180px repeat-y}
-.cream-chunk:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#88445d2e,#fff8eb0d 25%,#fff9efa6 43%,#fff7e924 68%,#8b405333);pointer-events:none}
-.cream-current{position:absolute;inset:-180px 0 0;background:linear-gradient(to bottom,transparent 0 12%,#fff9ee65 20% 37%,transparent 46% 62%,#fff9ee35 68% 72%,transparent 80%);background-size:100% 180px;animation:cream-pour 3s linear infinite;animation-play-state:paused;pointer-events:none}
+.cream-chunk:before{content:"";position:absolute;inset:0;background:url('assets/decor/cream-glaze.svg') center top/100% 180px repeat-y;pointer-events:none}
+/* A narrow travelling glint keeps the original glossy stream instead of washing out its colour. */
+.cream-current{position:absolute;top:-360px;bottom:0;left:45%;right:45%;background-image:radial-gradient(ellipse 48% 10% at 50% 22%,#fff9eea6,#fff9ee52 55%,transparent 100%),radial-gradient(ellipse 35% 3% at 50% 68%,#fff9ee66,transparent 100%);background-size:100% 360px;animation:cream-pour 6s linear infinite;animation-play-state:paused;pointer-events:none}
 .cream-chunk.is-flowing .cream-current{animation-play-state:running;will-change:transform}
-@keyframes cream-pour{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,180px,0)}}
+@keyframes cream-pour{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,360px,0)}}
 .decor-paused .cream-current,.decor-tab-hidden .cream-current,.is-dialog-open .cream-current{animation-play-state:paused!important;will-change:auto}
 .hero-bottom .mini-cake{border:0;width:43px;height:49px;flex-shrink:0}
 .mini-cake img{width:38px;height:47px;object-fit:contain}
