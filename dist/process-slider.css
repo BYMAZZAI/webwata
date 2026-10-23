@@ -14,3 +14,5 @@
 @keyframes process-enter{from{transform:translate3d(100%,0,0);opacity:.55}to{transform:translate3d(0,0,0);opacity:1}}
 @keyframes process-leave{from{transform:translate3d(0,0,0);opacity:1}to{transform:translate3d(-100%,0,0);opacity:0}}
 @media(prefers-reduced-motion:reduce){.process-slide.is-entering,.process-slide.is-leaving{animation:none!important}.process-slide.is-leaving{visibility:hidden}}
+
+.process-slide.is-entering,.process-slide.is-leaving{will-change:transform,opacity}

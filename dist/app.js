@@ -17,16 +17,10 @@
     const startY = window.scrollY;
     const destination = Math.max(0, Math.min(startY + target.getBoundingClientRect().top - $('.header').getBoundingClientRect().height - 16, document.documentElement.scrollHeight - innerHeight));
     if (reduceMotion.matches) { window.scrollTo({ top: destination, behavior: 'instant' }); return; }
-    const start = performance.now();
-    const frame = (now) => {
-      const p = Math.min((now - start) / MOTION_MS, 1);
-      const eased = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-      window.scrollTo({ top: startY + (destination - startY) * eased, behavior: 'instant' });
-      if (p < 1) scrollAnimation = requestAnimationFrame(frame);
-    };
-    scrollAnimation = requestAnimationFrame(frame);
+    window.scrollTo({top:target.id === 'top' ? 0 : destination, behavior:'smooth'});
   }
-  const money = (n) => new Intl.NumberFormat('ru-RU').format(Math.round(n)) + ' ₽';
+  const priceFormat = new Intl.NumberFormat('ru-RU');
+  const money = (n) => priceFormat.format(Math.round(n)) + ' ₽';
   const escapeHTML = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const state = { step: 0, tiers: 1, filling: 'strawberry', decor: 'berries', inscription: '', inspiration: '' };
   const galleryNames = ['Клубничный бантик', 'Фисташковое настроение', 'Шоколадный праздник', 'Тихая нежность', 'Белый шёлк', 'Розовое облако', 'Мишкин день', 'Выше облаков', 'Радуга внутри', 'Маленькое сердечко', 'Ромашковое утро', 'Вишенка для двоих'];
@@ -65,7 +59,7 @@
   function summary() { return `${tier().name} · ${filling().name} · ${decor().name}${state.inscription.trim() ? ' · «' + state.inscription.trim() + '»' : ''}`; }
   function animatePrice(target) {
     cancelAnimationFrame(priceAnimation);
-    if (reduceMotion.matches || !displayedPrice) { displayedPrice = target; $('#price').textContent = money(target); return; }
+    if (reduceMotion.matches || !displayedPrice || $('.builder-layout').hidden) { displayedPrice = target; $('#price').textContent = money(target); return; }
     const start = performance.now(), from = displayedPrice;
     const frame = (now) => { const p = Math.min((now - start) / MOTION_MS, 1); displayedPrice = from + (target - from) * (1 - (1 - p) ** 3); $('#price').textContent = money(displayedPrice); if (p < 1) priceAnimation = requestAnimationFrame(frame); };
     priceAnimation = requestAnimationFrame(frame);
@@ -183,8 +177,23 @@
   document.addEventListener('click', (e) => { if (!e.target.closest('.header')) closeMenu(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menu.classList.contains('open')) { closeMenu(); toggle.focus(); } });
   window.addEventListener('resize', () => { if (innerWidth > 930) closeMenu(); });
-  if (window.matchMedia('(pointer:fine)').matches) $('.hero').addEventListener('pointermove', (e) => { if (reduceMotion.matches) return; const r = $('.hero').getBoundingClientRect(); $('.sprinkles').style.setProperty('--dx', `${(e.clientX - r.left - r.width / 2) * .018}px`); $('.sprinkles').style.setProperty('--dy', `${(e.clientY - r.top - r.height / 2) * .018}px`); }, { passive: true });
-  $('.hero').addEventListener('pointerleave', () => { $('.sprinkles').style.setProperty('--dx', '0px'); $('.sprinkles').style.setProperty('--dy', '0px'); });
+  const hero = $('.hero'), sprinkles = $('.sprinkles');
+  let pointerFrame = 0, pointerX = 0, pointerY = 0;
+  if (window.matchMedia('(pointer:fine)').matches) hero.addEventListener('pointermove', (e) => {
+    if (reduceMotion.matches || document.hidden) return;
+    pointerX = e.clientX; pointerY = e.clientY;
+    if (pointerFrame) return;
+    pointerFrame = requestAnimationFrame(() => {
+      pointerFrame = 0;
+      const r = hero.getBoundingClientRect();
+      sprinkles.style.setProperty('--dx', `${(pointerX-r.left-r.width/2)*.018}px`);
+      sprinkles.style.setProperty('--dy', `${(pointerY-r.top-r.height/2)*.018}px`);
+    });
+  }, {passive:true});
+  hero.addEventListener('pointerleave', () => {
+    cancelAnimationFrame(pointerFrame); pointerFrame = 0;
+    sprinkles.style.setProperty('--dx', '0px'); sprinkles.style.setProperty('--dy', '0px');
+  });
   const fieldIds = { name: 'customer-name', phone: 'customer-phone', date: 'celebration-date', consent: 'consent' };
   function showErrors(errors) { Object.keys(fieldIds).forEach((key) => { const input = $('#' + fieldIds[key]); input.setAttribute('aria-invalid', String(Boolean(errors[key]))); $('#' + key + '-error').textContent = errors[key] || ''; }); }
   $('#celebration-date').min = localDate();

@@ -14,6 +14,13 @@
     if (paused || !visible || document.hidden || root.contains(document.activeElement) || document.querySelector('dialog[open]')) return;
     timer = setTimeout(() => { show(index + 1); }, 3000);
   }
+  function warmImage(i) {
+    const img = slides[(i+slides.length)%slides.length].querySelector('img');
+    if (img?.decode) img.decode().catch(() => {});
+  }
+  root.addEventListener('animationend', e => {
+    if (e.target.classList.contains('process-slide')) e.target.classList.remove('is-entering','is-leaving');
+  });
   function show(next, manual = false) {
     const previous = index;
     index = (next + slides.length) % slides.length;
@@ -27,6 +34,7 @@
     dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === index)));
     count.textContent = `${String(index + 1).padStart(2, '0')} / 06`;
     if (manual) status.textContent = `Шаг ${index + 1} из 6. ${slides[index].querySelector('h3').textContent}`;
+    warmImage(index+1);
     syncTimer();
   }
   function updatePause() {
@@ -58,7 +66,7 @@
   motion.addEventListener('change', () => { paused = motion.matches; updatePause(); });
   new MutationObserver(syncTimer).observe(document.body, {subtree:true, attributes:true, attributeFilter:['open']});
   if ('IntersectionObserver' in window) {
-    new IntersectionObserver(entries => { visible = entries[0].isIntersecting; syncTimer(); }, {threshold:.15}).observe(root);
+    new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) { warmImage(index); warmImage(index+1); } syncTimer(); }, {threshold:.15}).observe(root);
   } else visible = true;
   updatePause();
 })();
