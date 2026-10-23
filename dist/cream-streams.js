@@ -14,7 +14,11 @@
     ['#faq', '#c8b8d8'], ['#order', '#e7a0b4'], ['.footer', '#e7a0b4']
   ].map(([selector, color]) => ({element:document.querySelector(selector), color}));
   const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
-    entries.forEach(entry => entry.target.classList.toggle('is-flowing', entry.isIntersecting));
+    entries.forEach(entry => {
+      // A shared clock joins the small floating strips without a per-frame JS loop.
+      if (entry.isIntersecting) entry.target.style.setProperty('--float-phase', `-${performance.now()%12000}ms`);
+      entry.target.classList.toggle('is-flowing', entry.isIntersecting);
+    });
   }, {rootMargin:'80px 0px', threshold:0}) : null;
   let previous = '';
   function draw() {
@@ -52,7 +56,7 @@
         if (!chunk) {
           chunk = document.createElement('div');
           chunk.className = 'cream-chunk';
-          chunk.innerHTML = '<span class="cream-current"></span>';
+          chunk.innerHTML = '<span class="cream-current"></span><span class="marshmallow-drift"><i class="marshmallow"></i><i class="marshmallow"></i><i class="marshmallow"></i></span>';
           chunk.style.top = `${i*CHUNK}px`;
           chunk.style.setProperty('--chunk-y', `${i*CHUNK}px`);
           lane.append(chunk);

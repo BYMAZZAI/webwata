@@ -1,7 +1,7 @@
 /* Small cached masks; only visible 720 px chunks have a moving compositor layer. */
 body{position:relative}
 .cream-streams{position:absolute;left:0;right:0;pointer-events:none;overflow:hidden;z-index:4;contain:layout paint}
-.cream-flow{position:absolute;top:0;bottom:0;width:clamp(28px,calc((100vw - 1240px)/2 - 12px),240px);pointer-events:none;opacity:.9}
+.cream-flow{--lane-width:clamp(28px,calc((100vw - 1240px)/2 - 12px),240px);position:absolute;top:0;bottom:0;width:var(--lane-width);pointer-events:none;opacity:.9}
 .cream-flow-left{left:0}.cream-flow-right{right:0;transform:scaleX(-1)}
 .cream-chunk{position:absolute;left:0;right:0;overflow:hidden;contain:layout paint;isolation:isolate;background-image:var(--cream-colors);background-size:100% var(--cream-height);background-position:0 calc(-1 * var(--chunk-y));-webkit-mask:url('assets/decor/cream-mask.svg') center top/100% 180px repeat-y;mask:url('assets/decor/cream-mask.svg') center top/100% 180px repeat-y}
 .cream-chunk:before{content:"";position:absolute;inset:0;background:url('assets/decor/cream-glaze.svg') center top/100% 180px repeat-y;pointer-events:none}
@@ -9,11 +9,19 @@ body{position:relative}
 .cream-current{position:absolute;top:-360px;bottom:0;left:45%;right:45%;background-image:radial-gradient(ellipse 48% 10% at 50% 22%,#fff9eea6,#fff9ee52 55%,transparent 100%),radial-gradient(ellipse 35% 3% at 50% 68%,#fff9ee66,transparent 100%);background-size:100% 360px;animation:cream-pour 6s linear infinite;animation-play-state:paused;pointer-events:none}
 .cream-chunk.is-flowing .cream-current{animation-play-state:running;will-change:transform}
 @keyframes cream-pour{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,360px,0)}}
+/* Three repeated sweets form a seamless strip; only visible strips animate. */
+.marshmallow-drift{position:absolute;top:-360px;left:0;width:100%;height:1080px;pointer-events:none;animation-duration:12s;animation-timing-function:linear;animation-iteration-count:infinite;animation-delay:var(--float-phase,0ms)}
+.marshmallow{position:absolute;left:50%;top:80px;width:calc(var(--lane-width)*.22);height:calc(var(--lane-width)*.25);margin-left:calc(var(--lane-width)*-.11);border-radius:42% 42% 36% 36%;background:radial-gradient(ellipse 64% 24% at 49% 17%,#fffef9 70%,#f8e0e6 76%,transparent 85%),linear-gradient(100deg,#fff3ec 10%,#fffaf2 35%,#f5cbdc 74%,#d99dbb);box-shadow:inset -1px -2px 2px #a05d7526,0 2px 2px #883d5433;transform:rotate(-14deg)}
+.marshmallow:nth-child(2){top:440px}.marshmallow:nth-child(3){top:800px}
+.cream-flow-right .marshmallow{background:radial-gradient(ellipse 64% 24% at 49% 17%,#fffef9 70%,#e6eddd 76%,transparent 85%),linear-gradient(100deg,#fff8ed 10%,#fffdf2 35%,#d7e8cc 74%,#acc5ad)}
+.cream-chunk.is-flowing .marshmallow-drift{animation-name:marshmallow-float;will-change:transform}
+@keyframes marshmallow-float{0%{transform:translate3d(0,0,0)}12.5%{transform:translate3d(calc(var(--lane-width)*.076),45px,0)}25%{transform:translate3d(0,90px,0)}37.5%{transform:translate3d(calc(var(--lane-width)*-.076),135px,0)}50%{transform:translate3d(0,180px,0)}62.5%{transform:translate3d(calc(var(--lane-width)*.076),225px,0)}75%{transform:translate3d(0,270px,0)}87.5%{transform:translate3d(calc(var(--lane-width)*-.076),315px,0)}100%{transform:translate3d(0,360px,0)}}
+.decor-paused .marshmallow-drift,.decor-tab-hidden .marshmallow-drift,.is-dialog-open .marshmallow-drift{animation-play-state:paused!important;will-change:auto}
 .decor-paused .cream-current,.decor-tab-hidden .cream-current,.is-dialog-open .cream-current{animation-play-state:paused!important;will-change:auto}
 .hero-bottom .mini-cake{border:0;width:43px;height:49px;flex-shrink:0}
 .mini-cake img{width:38px;height:47px;object-fit:contain}
 .art-label>span{display:block;width:32px;flex:0 0 32px}
 .art-label>span img{width:32px;height:42px;object-fit:contain}
-@media(max-width:930px){.cream-flow{width:24px;opacity:.8}}
-@media(max-width:650px){.cream-flow{width:14px;opacity:.65}.art-label>span{width:26px;flex-basis:26px}.art-label>span img{width:26px;height:34px}}
-@media(prefers-reduced-motion:reduce){.cream-current{animation:none!important;will-change:auto!important}}
+@media(max-width:930px){.cream-flow{--lane-width:24px;opacity:.8}}
+@media(max-width:650px){.cream-flow{--lane-width:14px;opacity:.65}.art-label>span{width:26px;flex-basis:26px}.art-label>span img{width:26px;height:34px}}
+@media(prefers-reduced-motion:reduce){.cream-current,.cream-chunk.is-flowing .marshmallow-drift{animation:none!important;will-change:auto!important}}
